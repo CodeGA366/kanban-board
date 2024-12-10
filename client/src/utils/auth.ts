@@ -1,6 +1,30 @@
 import { JwtPayload, jwtDecode } from 'jwt-decode';
 
 class AuthService {
+  constructor() {
+    this.setupInactivityTimer();
+  }
+
+  setupInactivityTimer() {
+    let inactivityTimer: number | undefined;
+    const inactivityDuration = 5 * 60 * 1000;//5 minutes inactivity
+
+    const resetInactivityTimer = () => {
+      clearTimeout(inactivityTimer);
+      console.log('Inactivity timer reset');
+
+      inactivityTimer = setTimeout(() => {
+        console.log('Inactivity timeout');
+        this.logout();
+      }, inactivityDuration);//5 minutes inactivity
+
+      const remainingTime = inactivityDuration / 1000; //convert to seconds
+      console.log(`Inactivity timeout in ${remainingTime} seconds`);
+    };
+    window.addEventListener('click', resetInactivityTimer);
+    window.addEventListener('keydown', resetInactivityTimer);
+    resetInactivityTimer();
+  }
   getProfile() {
     //return the decoded token
     return jwtDecode(this.getToken());
